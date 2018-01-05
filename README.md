@@ -1,6 +1,3 @@
-I am not maintaining this repository anymore and I would like to request you to find a better repo or make a fork of this repository!
-============================
-
 PDO Database Class
 ============================
 
