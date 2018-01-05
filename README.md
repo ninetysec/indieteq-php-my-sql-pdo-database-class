@@ -12,6 +12,7 @@ host = 127.0.0.1
 user = root
 password = 
 dbname = yourdatabase
+charset = gbk
 ```
 #### 2. Require the class in your project
 ```php
