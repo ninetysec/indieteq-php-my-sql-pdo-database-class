@@ -1,20 +1,19 @@
 <?php
-/**
- *  DB - A simple database class 
- *
- * @author		Author: Vivek Wicky Aswal. (https://twitter.com/#!/VivekWickyAswal)
- * @git 		https://github.com/wickyaswal/PHP-MySQL-PDO-Database-Class
- * @version      0.2ab
+/* *
+ * DB - A simple database class 
+ * @author       Author: Vivek Wicky Aswal / Scar1et
+ * @git          https://github.com/wickyaswal/PHP-MySQL-PDO-Database-Class
+ * @version      0.2
  *
  */
-require("Log.class.php");
+require("DbLog.class.php");
 class DB
 {
     # @object, The PDO object
     private $pdo;
     
     # @object, PDO statement object
-    private $sQuery;
+    public $sQuery;
     
     # @array,  The database settings
     private $settings;
@@ -24,7 +23,7 @@ class DB
     
     # @object, Object for logging exceptions	
     private $log;
-    
+
     # @array, The parameters of the SQL query
     private $parameters;
     
@@ -37,7 +36,7 @@ class DB
      */
     public function __construct()
     {
-        $this->log = new Log();
+        $this->log = new DbLog();
         $this->Connect();
         $this->parameters = array();
     }
@@ -52,7 +51,7 @@ class DB
      */
     private function Connect()
     {
-        $this->settings = parse_ini_file("settings.ini.php");
+        $this->settings = parse_ini_file("Settings.ini.php");
         $dsn            = 'mysql:dbname=' . $this->settings["dbname"] . ';host=' . $this->settings["host"] . ';charset=' . $this->settings["charset"] . '';
         try {
             # Read settings from INI file, set UTF8
@@ -73,6 +72,7 @@ class DB
             die();
         }
     }
+
     /*
      *   You can use this little method if you want to close the PDO connection
      *
@@ -148,6 +148,7 @@ class DB
     {
         $this->parameters[sizeof($this->parameters)] = [":" . $para , $value];
     }
+
     /**
      *	@void
      *	
@@ -163,6 +164,7 @@ class DB
             }
         }
     }
+
     /**
      *  If the SQL query  contains a SELECT or SHOW statement it returns an array containing all of the result set row
      *	If the SQL statement is a DELETE, INSERT, or UPDATE statement it returns the number of affected rows
@@ -249,6 +251,7 @@ class DB
         return $column;
         
     }
+
     /**
      *	Returns an array which represents a row from the result set 
      *
@@ -264,6 +267,7 @@ class DB
         $this->sQuery->closeCursor(); // Frees up the connection to the server so that other SQL statements may be issued,
         return $result;
     }
+
     /**
      *	Returns the value of one single field/column
      *
@@ -278,6 +282,7 @@ class DB
         $this->sQuery->closeCursor(); // Frees up the connection to the server so that other SQL statements may be issued
         return $result;
     }
+
     /**	
      * Writes the log and returns the exception
      *

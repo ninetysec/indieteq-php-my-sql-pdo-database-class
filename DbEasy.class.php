@@ -1,12 +1,12 @@
 <?php 
-/**
-* Easy Crud  -  This class kinda works like ORM. Just created for fun :) 
-*
-* @author		Author: Vivek Wicky Aswal. (https://twitter.com/#!/VivekWickyAswal)
-* @version      0.1a
-*/
-require_once(__DIR__ . '/../Db.class.php');
-class Crud {
+/* *
+ * Easy Crud  -  This class kinda works like ORM. Just created for fun :) 
+ * @author		Author: Vivek Wicky Aswal / Scar1et
+ * @git 			https://github.com/wickyaswal/PHP-MySQL-PDO-Database-Class
+ * @version      0.2
+ */
+require_once("Db.class.php");
+class DbEasy {
 
 	private $db;
 
@@ -60,10 +60,14 @@ class Crud {
 				$sql = "UPDATE " . $this->table .  " SET " . $fieldsvals;
 			}
 
-			return $this->exec($sql);
+			$result = $this->exec($sql);
+
+			return $result;
 		}
 
-		return null;
+		$this->variables = false;
+
+		return $this;
 	}
 
 	public function create() { 
@@ -78,7 +82,9 @@ class Crud {
 			$sql 		= "INSERT INTO ".$this->table." () VALUES ()";
 		}
 
-		return $this->exec($sql);
+		$result = $this->exec($sql);
+
+		return $this->db->lastInsertId();
 	}
 
 	public function delete($id = "") {
@@ -88,7 +94,9 @@ class Crud {
 			$sql = "DELETE FROM " . $this->table . " WHERE " . $this->pk . "= :" . $this->pk. " LIMIT 1" ;
 		}
 
-		return $this->exec($sql, array($this->pk=>$id));
+		$result = $this->exec($sql, array($this->pk=>$id));
+
+		return $result;
 	}
 
 	public function find($id = "") {
@@ -96,9 +104,10 @@ class Crud {
 
 		if(!empty($id)) {
 			$sql = "SELECT * FROM " . $this->table ." WHERE " . $this->pk . "= :" . $this->pk . " LIMIT 1";	
-			
+
 			$result = $this->db->row($sql, array($this->pk=>$id));
 			$this->variables = ($result != false) ? $result : null;
+			return $this;
 		}
 	}
 	/**
@@ -114,6 +123,7 @@ class Crud {
 	*/
 	public function search($fields = array(), $sort = array()) {
 		$bindings = empty($fields) ? $this->variables : $fields;
+		$this->variables = $bindings;
 
 		$sql = "SELECT * FROM " . $this->table;
 
@@ -133,41 +143,68 @@ class Crud {
 			}
 			$sql .= " ORDER BY " . implode(", ", $sortvals);
 		}
-		return $this->exec($sql);
+
+		$result = $this->exec($sql);
+
+		return $result;
 	}
 
 	public function all(){
-		return $this->db->query("SELECT * FROM " . $this->table);
+		$result = $this->db->query("SELECT * FROM " . $this->table);
+		$this->variables = ($result != false) ? $result : null;
+
+		return $this;
 	}
 	
 	public function min($field)  {
 		if($field)
-		return $this->db->single("SELECT min(" . $field . ")" . " FROM " . $this->table);
+		$result = $this->db->single("SELECT min(" . $field . ")" . " FROM " . $this->table);
+		$this->variables = ($result != false) ? $result : null;
+
+		return $this;
 	}
 
 	public function max($field)  {
 		if($field)
-		return $this->db->single("SELECT max(" . $field . ")" . " FROM " . $this->table);
+		$result = $this->db->single("SELECT max(" . $field . ")" . " FROM " . $this->table);
+		$this->variables = ($result != false) ? $result : null;
+
+		return $this;
 	}
 
 	public function avg($field)  {
 		if($field)
-		return $this->db->single("SELECT avg(" . $field . ")" . " FROM " . $this->table);
+		$result = $this->db->single("SELECT avg(" . $field . ")" . " FROM " . $this->table);
+		$this->variables = ($result != false) ? $result : null;
+
+		return $this;
 	}
 
 	public function sum($field)  {
 		if($field)
-		return $this->db->single("SELECT sum(" . $field . ")" . " FROM " . $this->table);
+		$result = $this->db->single("SELECT sum(" . $field . ")" . " FROM " . $this->table);
+		$this->variables = ($result != false) ? $result : null;
+
+		return $this;
 	}
 
 	public function count($field)  {
 		if($field)
-		return $this->db->single("SELECT count(" . $field . ")" . " FROM " . $this->table);
+		$result = $this->db->single("SELECT count(" . $field . ")" . " FROM " . $this->table);
+		$this->variables = ($result != false) ? $result : null;
+
+		return $this;
 	}	
-	
+
+	public function toSql() {
+		return $this->db->sQuery->queryString;
+	}
+
+	public function toArray() {
+		return $this->variables;
+	}
 
 	private function exec($sql, $array = null) {
-		
 		if($array !== null) {
 			// Get result with the DB object
 			$result =  $this->db->query($sql, $array);	
